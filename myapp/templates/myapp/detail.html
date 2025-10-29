@@ -1,0 +1,11 @@
+{% extends 'myapp/base.html' %}
+{% block title %}{{ book.title }} — Details{% endblock %}
+{% block myhdg %}Book Detail{% endblock %}
+
+{% block body_block %}
+  <h2>{{ book.title|upper }}</h2>
+  <p><strong>Price:</strong>
+     {% if book.price == 0 %}Free Book{% else %}${{ book.price }}{% endif %}
+  </p>
+  <p><strong>Publisher:</strong> {{ book.publisher.name }}</p>
+{% endblock %}

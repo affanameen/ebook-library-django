@@ -1,0 +1,19 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Home{% endblock %}
+{% block myhdg %}Hello Affan{% endblock %}
+
+{% block body_block %}
+  {% if booklist %}
+    <h2>List of Books</h2>
+    <ol>
+      {% for book in booklist %}
+        <li>
+          <a href="{% url 'myapp:detail' book.id %}">{{ book.title }}</a>
+          {% if book.price == 0 %} — <em>Free Book</em>{% else %} — ${{ book.price }}{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <strong>There are no available books!</strong>
+  {% endif %}
+{% endblock %}

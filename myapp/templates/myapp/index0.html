@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>eBook Website - Index (Part 1)</title>
+</head>
+<body>
+
+{% if booklist %}
+  <h2>List of Books</h2>
+  <ol>
+    {% for book in booklist %}
+      <li>
+        <a href="{% url 'myapp:detail' book.id %}">{{ book.title }}</a>
+        {% if book.price == 0 %} — <em>Free Book</em>
+        {% else %} — ${{ book.price }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <strong>There are no available books!</strong>
+{% endif %}
+
+<p><a href="{% url 'myapp:about' %}">About page</a></p>
+</body>
+</html>
