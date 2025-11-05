@@ -1,0 +1,21 @@
+{% extends 'myapp/base.html' %}
+{% block body_block %}
+  <h3>Hello {{ name|default:"User" }}</h3>
+
+  {% if category %}
+    <p>Category selected: {{ category }}</p>
+  {% else %}
+    <p>No specific category selected.</p>
+  {% endif %}
+
+  {% if booklist %}
+    <p>Books with price ≤ your maximum:</p>
+    <ul>
+      {% for b in booklist %}
+        <li>{{ b.title }} — {% if b.price == 0 %}Free Book{% else %}${{ b.price }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No books found under that price filter{% if category %} and category{% endif %}.</p>
+  {% endif %}
+{% endblock %}

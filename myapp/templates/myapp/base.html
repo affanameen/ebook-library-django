@@ -9,8 +9,10 @@
 <body>
   <h1>{% block myhdg %}Hello User{% endblock %}</h1>
   <ul>
-    <li class="hbar1"><a href="{% url 'myapp:index' %}">Home</a></li>
-    <li class="hbar1"><a href="{% url 'myapp:about' %}">About</a></li>
+      <li class="hbar1"><a href="{% url 'myapp:index' %}">Home</a></li>
+      <li class="hbar1"><a href="{% url 'myapp:about' %}">About</a></li>
+      <li class="hbar1"><a href="{% url 'myapp:feedback1' %}">Feedback</a></li>
+      <li class="hbar1"><a href="{% url 'myapp:findbooks' %}">Find Books</a></li>
   </ul>
   <hr>
   {% block body_block %}{% endblock %}
