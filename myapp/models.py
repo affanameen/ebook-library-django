@@ -25,6 +25,7 @@ class Book(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
+    num_reviews = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.title} - {self.get_category_display()} (${self.price})"
@@ -63,3 +64,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.pk} - {self.member} - {self.get_order_type_display()} on {self.order_date}"
+
+class Review(models.Model):
+    reviewer = models.EmailField()
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField()
+    comments = models.TextField(blank=True)  # optional
+    date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.reviewer} — {self.book.title} ({self.rating}/5)"

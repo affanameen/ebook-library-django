@@ -1,0 +1,15 @@
+{% extends 'myapp/base.html' %}
+{% block body_block %}
+  <h2>Order Submitted</h2>
+  <p><strong>Order #{{ order.id }}</strong></p>
+  {% if books %}
+    <p>Books in this order:</p>
+    <ul>
+      {% for b in books %}
+        <li>{{ b.title }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No books were selected.</p>
+  {% endif %}
+{% endblock %}
