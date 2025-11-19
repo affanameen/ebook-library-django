@@ -1,14 +1,45 @@
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .forms import FeedbackForm, SearchForm, OrderForm, ReviewForm
-from .models import Book, Review
+from .models import Book, Review, Member
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.db.models import Avg
+import random
 
 def index(request):
     booklist = Book.objects.all().order_by('id')
-    return render(request, 'myapp/index.html', {'booklist': booklist})
+
+    last_login = request.session.get('last_login', None)
+    if last_login:
+        last_login_msg = f"Your last login was at: {last_login}"
+    else:
+        last_login_msg = "Your last login was more than one hour ago."
+
+    return render(request, 'myapp/index.html', {
+        'booklist': booklist,
+        'last_login_msg': last_login_msg,
+    })
+
 
 def about(request):
-    return render(request, 'myapp/about.html')
+    # --- Lucky number cookie logic ---
+    lucky_cookie = request.COOKIES.get('lucky_num')
+
+    if lucky_cookie:
+        mynum = int(lucky_cookie)
+    else:
+        mynum = random.randint(1, 100)
+
+    response = render(request, 'myapp/about.html', {'mynum': mynum})
+
+    # Set cookie to expire in 5 minutes (300 seconds)
+    response.set_cookie('lucky_num', mynum, max_age=300)
+
+    return response
+
 
 def detail(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -115,3 +146,65 @@ def review(request):
     else:
         form = ReviewForm()
         return render(request, 'myapp/review.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+
+                # --- Lab 9: save last_login in session and set expiry ---
+                now = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+                request.session['last_login'] = now
+                request.session.set_expiry(3600)  # 1 hour
+
+                return HttpResponseRedirect(reverse('myapp:index'))
+            else:
+                return HttpResponse('Your account is disabled.')
+        else:
+            return HttpResponse('Invalid login details.')
+    else:
+        return render(request, 'myapp/login.html')
+
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('myapp:index'))
+
+@login_required
+def chk_reviews(request, book_id):
+    # Correct way: Member IS the user, so use pk or username
+    try:
+        member = Member.objects.get(pk=request.user.pk)
+        # or: Member.objects.get(username=request.user.username)
+    except Member.DoesNotExist:
+        message = 'You are not a registered member!'
+        return render(request, 'myapp/chk_reviews.html', {
+            'message': message,
+            'book': None,
+            'avg_rating': None,
+        })
+
+    # User is a Member → proceed to book and reviews
+    book = get_object_or_404(Book, pk=book_id)
+    reviews = Review.objects.filter(book=book)
+
+    if reviews.exists():
+        agg = reviews.aggregate(avg=Avg('rating'))
+        avg_rating = round(agg['avg'], 2)
+        message = None
+    else:
+        avg_rating = None
+        message = 'There are no reviews submitted for this book yet.'
+
+    return render(request, 'myapp/chk_reviews.html', {
+        'book': book,
+        'avg_rating': avg_rating,
+        'message': message,
+    })
+

@@ -1,0 +1,13 @@
+{% extends 'myapp/base.html' %}
+{% block body_block %}
+  {% if book %}
+    <h2>Reviews for "{{ book.title }}"</h2>
+    {% if avg_rating %}
+      <p>Average rating: {{ avg_rating }} / 5</p>
+    {% else %}
+      <p>{{ message }}</p>
+    {% endif %}
+  {% else %}
+    <p>{{ message }}</p>
+  {% endif %}
+{% endblock %}

@@ -3,6 +3,8 @@
 {% block myhdg %}Hello Affan{% endblock %}
 
 {% block body_block %}
+  <p>{{ last_login_msg }}</p>
+
   {% if booklist %}
     <h2>List of Books</h2>
     <ol>
@@ -17,3 +19,4 @@
     <strong>There are no available books!</strong>
   {% endif %}
 {% endblock %}
+
