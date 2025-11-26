@@ -45,6 +45,9 @@ class Member(User):
     auto_renew = models.BooleanField(default=True)
     borrowed_books = models.ManyToManyField('Book', blank=True)
 
+    class Meta:
+        verbose_name = 'Member'
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.username})"
 
@@ -61,6 +64,8 @@ class Order(models.Model):
 
     def total_items(self):
         return self.books.count()
+
+    total_items.short_description = 'Total Books'
 
     def __str__(self):
         return f"Order #{self.pk} - {self.member} - {self.get_order_type_display()} on {self.order_date}"
